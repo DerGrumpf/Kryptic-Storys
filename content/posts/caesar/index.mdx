@@ -23,7 +23,7 @@ Als erstes muss nun eine Liste erzeugt werden die die Werte von A-Z beinhält. H
 
 ![ASCII Tabelle](./ascii-table.jpeg)
 
-Der für unseren Alghoritmus benötigte Zahlenraum liegt zwischen *A=65 & Z=90*. Nun können wir also unsere Liste vollständig erzeugen. Die benötigte *range()* Funktion zählt immer bis zu eingegebenen Wert -1, wie im Artikel [Die Lookup Methode](https://krypticstorys.gatsbyjs.io/lookup) zu sehen. Außerdem lässt sich ein Start- & ein Endwert definieren (es gibt auch die möglichkeit anzugeben wie Schritte beim durchlauf benötigt werden). Wir definieren hierfür range mit *range(65, 91)*:
+Der für unseren Alghoritmus benötigte Zahlenraum liegt zwischen *A=65 & Z=90*. Nun können wir also unsere Liste vollständig erzeugen. Die benötigte *range()* Funktion zählt immer bis zu eingegebenen Wert -1, wie im Artikel [Die Lookup Methode](https://kryptic-storys.de/lookup) zu sehen. Außerdem lässt sich ein Start- & ein Endwert definieren (es gibt auch die möglichkeit anzugeben wie Schritte beim durchlauf benötigt werden). Wir definieren hierfür range mit *range(65, 91)*:
 
 ```python
 alphabet = [chr(n) for n in range(65, 91)]

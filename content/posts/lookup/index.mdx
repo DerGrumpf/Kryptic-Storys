@@ -1,6 +1,105 @@
 ---
-title: "Die Lookup Methode"
-date: 2021-05-15
+title: Die Lookup Methode
+date: 2021-05-16
 slug: "/lookup"
+description: In diesem Abschnitt wird erklärt wie die Lookup Methode funktioniert.
+tags:
+	- Monoalphabetische Verschlüsselung
+	- Polyalphabetische Verschlüsselung
 ---
 
+Zuerst welche Vorteile bietet diese Methode:
+
+1. Sie ist relativ einfach umzusetzen
+2. Sie ist sehr schnell
+3. Sie ist einfach zu erweitern
+4. Sie ist robust gegen Fehler
+5. Sie lässt sich meist leicht erzeugen
+
+Bei der Lookup Methode geht es darum eine statische Datenstrucktur (Tabelle, Liste, auch ganz andere Mathematische Struckturen wie Bäume) zu erzeugen, um mit einer schnellen Funktion auf ihre Werte zugreifen zu können.  
+Der Vorteil besteht darin mit einem Schlüssel (auch Index genannt) die Werte mit einer sehr geringen Komplexität zu erreichen.
+
+***
+Komplexität beschreibt in der Informatik eine Abschätzung für die benötigte Rechenzeit eines Prozesses und wird in der Landau-Notation mit *O(n)* angegeben.
+*O(n)* ist hierbei beschreibt hierbei nur die Abschätzung keine realle Rechenzeit da diese von Computer zu Computer varieren kann. *n* ist die Anzahl an Objekte der Alghoritmus bekommt.
+Mathematisch betrachtet schaut man sich jedoch nur das Verhalten für *n -> ∞ (n strebt gegen unendlich)* an.
+
+Hierbei unterscheidet man zwischen einfachen Klassen der Komplexität:
+1. Konstantes Verhalten *O(1)*
+2. Logharitmisches Verhalten *O(log n)*
+3. Lineares Verhalten *O(n)*
+4. Polynomielles Verhalten *O(n<sup>2</sup>)* 
+5. Exponentielles Verhalten *O(2<sup>n</sup>)*
+6. Faktorielles Verhalten *O(n!)*
+
+Das sind die 6 wichtigsten. Für eine genauere Definition empfehle ich die Seite zu den [Landau Symbolen](https://de.wikipedia.org/wiki/Landau-Symbole) auf Wikipedia.
+
+Für Nummer 1 & 3 will ich jeweils ein Beispiel geben. Wir nehmen uns hierfür eine Liste mit 4 Elementen, die wie folgt aussieht: *[1, 4, 20, 14]*
+
+Nummer 1 beschreibt, dass egal wie groß die Liste auch ist der Alghoritmus immer eine konstante Rechenzeit benötigt. Der hierfür beste Alghoritmus ist der einfache *Lookup*. Wollen wir auf Element 2 zugreifen (in der Informatik fängt man an von 0 zu zählen) kann der Computer das ohne Mühe da ihm zu jedem Zeitpunkt bewusst ist wo welcher Wert im Speicher liegt. Das Resultat des Lookups an der Stelle 2 ist 20.
+
+Für Nummer 3 wollen wir einen Alghoritmus der auf der Liste eine lineare Zeit braucht. Hierfür eignet sich am besten die *lineare Suche*. Will der Computer in einer (ganz wichtig!) ungeordneten Liste wissen welches das größte Element ist, muss er zwingend einmal über die Länge *n* der Liste laufen und dabei jeden Wert prüfen. Bedeutet das für *n = 4* die lineare Suche eine Komplexität von *O(4)* aufweist. Wenn wir die Liste auf eine größe von 1.000.000 erhöhen, was in der Datenverarbeitung eine noch relativ kleine Datenbank wäre, bräuchte die Lineare Suche auch *O(1.000.000)* schritten um den größten Wert zu finden. 
+***
+
+In der Programmiersprache *Python* gibt es eine besondere Datenstrucktur das Dictionary.
+Das Dictionary ist eine besondere Datenstrucktur, es funktioniert so das es jedem Datenwert einen Schlüssel zuordnet. Hierbei können die Werte des Schlüssel Zahlen & Buchstaben (auch exotische Objekte die wir aber auf unserer Reise nicht verwenden werden) sein.
+Jedem Schlüssel wird dann ein Wert hinzugefügt, dies kann eine einfache Zahl, ein Wort oder Buchstabe, eine Liste, auch ein weiteres Dictionary oder vergleichbares Objekt sein.
+Hierzu ein kleines Code Beispiel:
+```python
+Dict = {
+	'A': 1,
+	4 : "Hallo!",
+	"Liste": [9, 6, 20],
+	'π': {3: Zahl(), ',': Komma(), 1: Zahl(), 4: Zahl(), 1: Zahl()},
+}
+```
+Die einzelnen Schlüssel-Wert-Paare werden mit einem Komma getrennt und auf sie kann wie folgt zugegriffen werden:
+```python
+wert1 = Dict['A'] 	# wert1 hat nun den Wert 1
+wert2 = Dict[4] 	# wert2 hat nun den Wert "Hallo!" 
+```
+Eine besondere Eigenschaft der Sprache Python ist das sytaktische Kontruckt der *Dictionary Comprehension*. Es ermöglicht innerhalb eines Dictionaries Schlüssel-Werte-Paare in sehr kurzer schreibwesise zu erzeugen. Ein Beispiel, es soll ein Dictionary erzeugt werden das jedem *n* den Wert *n+1* zuordnet, für die Werte von 0-9:
+```python
+table = {n : n+1 for n in range(10)}
+```
+Die Ausgabe sieht dann wie folgt aus:
+```python
+table = {
+	0: 1,
+	1: 2,
+	2: 3,
+	3: 4,
+	4: 5,
+	5: 6,
+	6: 7,
+	7: 8,
+	8: 9,
+	9: 10,
+}
+```
+Der obige Code ist einfach und an die Mathematische Notation von Mengen angelehnt. Nicht zuletzt wird sie uns im folgenden oft begleiten. Ich zeige jetzt nur einmal wie man selbiges in mehrern einzelnen Schritten machen würde. In allen folgenden Beispielen werde ich dennoch die Kurzschreibweise verwenden.
+
+Wie es ausgeschrieben stehen würde:
+```python
+table = {} 			# erzeuge ein leeres Dictionary
+for n in range(10): # "führe 10-mal aus"
+	table[n] = n+1	# setze den Schlüssel n und gebe ihm den Wert n+1
+```
+
+Selbiges Funktioniert auch mit Listen die Notation ändert sich dahingehend nur geringfügig. Ein Beispiel um eine Liste mit den Elementen von 0-9 zu erzeugen: 
+```python
+Liste = [n for n in range(10)]
+# Output:
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+Als letztes ist es möglich konditionale Argumente mit in die Berechnung einzubringen. Hierzu wird hinten an die Liste ein *if-Statement* definiert. Wir wollen im folgenden Beispiel eine liste aller geraden und eine aller ungeraden Zahlen zwischen 0-10. Hierfür prüfen wir ob der Rest der Zahl bei einer Division mit der Zahl 2, 0 für gerade Zahlen oder 1 für ungerade Zahlen ist. Das *%-Zeichen* ist der *Modulo-Operator*, er gibt zurück wie viel Rest beim teilen mit der Zahl rechts übrig bleibt also *3 % 2 = 1 Rest 1*: 
+```python
+gerade_zahlen = [n for n in range(10) if n % 2 == 0]
+ungerade_zahlen = [n for n in range(10) if n % 2 == 1]
+# Output:
+# gerade_zahlen:
+[0, 2, 4, 6, 8]
+# ungerade_zahlen:
+[1, 3, 5, 7, 9]
+```
+Da wir jetzt Wissen wie wir Lookup Tabellen erzeugen können sollten geht nun weiter zu [Cäsars Verschlüsselung](https://krypticstorys.gatsbyjs.io/caesar).

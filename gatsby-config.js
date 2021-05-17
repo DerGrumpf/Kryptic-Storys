@@ -43,10 +43,6 @@ module.exports = {
             name: `HBK BS`,
             url: `https://www.hbk-bs.de/`,
           },
-          {
-            name: `Instagram`,
-            url: `https://www.instagram.com/dergrumpf/`,
-          },
         ],
       },
     },

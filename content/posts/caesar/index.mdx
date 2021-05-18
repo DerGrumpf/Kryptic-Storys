@@ -6,6 +6,11 @@ tags:
 - Monoalphabetische Verschlüsselung
 ---
 
+import CaesarForm from "./CaesarForm";
+
+<CaesarForm/>
+
+
 Nicht nur Kriegsherr, sondern auch Krypthograph. Aber wie bringen wir unserem Computer bei Cäsars bester Krypthograph zu sein? 
 
 Zuerst einmal müssen wir Festhalten wie der Alghoritmus funktionieren muss. Wie bei jeder Monoalphabetischen verschlüsselung wird ein Text mit anderen Zeichen verschlüsselt. Cäsar macht es uns hierbei sehr einfach in dem er einfach sagt, dass jeder Buchstabe um den Wert 3 im lateinischen Alphabet verschoben wird. Da der Wert aber einfach zu knacken wäre wollen wir eine Variable die jeden positiven ganzzahligen Wert annehmen kann. Es wird noch klar warum wir den Bereich nicht zwischen 0-25 begrenzen. Was fehlt unserem Alghoritmus jetzt noch fehlt ist eine Lookup Tabelle, hierfür verwenden wir zwei Listen, das Originale Alphabet und das verschobene die dann zusammen zu einem Dictionary verpackt werden.
@@ -158,3 +163,4 @@ caesar(text, 2, True)
 'DNCEMOCIKE'
 
 ``` 
+

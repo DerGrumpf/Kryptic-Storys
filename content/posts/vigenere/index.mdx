@@ -1,0 +1,57 @@
+---
+title: Vigenère Chiffre
+date: 2021-05-19
+slug: "/vigenere"
+description: Polyalphabetische Verschlüsselung
+tags:
+- Polyalphabetische Verschlüsselung
+---
+***
+###### Schritt 1
+```python
+alphabet = [chr(c) for c in range(65,91)]
+```
+
+***
+###### Schritt 2
+```python
+def build_shifted_alphabet(offset: int) -> list:
+	shifted: list[str] = []
+
+	for n in range(alphabet):
+		index: int = (n + offset) % len(al)
+		shifted.append(alphabet[index])
+
+	return shifted
+```
+Und in kurzer Form:
+
+```python
+shifted = lambda offset: [
+	alphabet[(n + offset) % len(alphabet)] 
+	for n in range(len(alphabet))
+]
+```
+
+***
+###### Schritt 3
+```python
+table = {
+	alphabet[i]: shifted(i)
+	for i in range(len(alphabet))
+}
+```
+
+***
+###### Schritt 4
+```python
+text = "BLACKMAGIC"
+key = "XXX"
+```
+
+***
+###### Schritt 5
+```python
+encoder = lambda c, k: pass
+decoder = lambda c, k: pass
+```

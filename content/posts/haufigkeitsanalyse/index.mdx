@@ -1,0 +1,381 @@
+---
+title: Häufigkeitsanalyse
+date: 2021-05-18
+slug: "/haeufigkeitsanalyse"
+description: Häufigkeitsanalyse
+tags:
+- Monoalphabetische Verschlüsselung
+- Polyalphabetische Verschlüsselung
+---
+Da ich mir die Ehre zu Teil kommen lasse, seit nun mehr als 3 Jahren aktiver Contributer für das Framework [Chart.js](https://www.chartjs.org/) zu sein; gilt mein dank den vielen anderen Kollegen mit, denen ich seit jeher daran arbeite.
+Das folgende interaktive Beispiel ist mit dem Chart.js Framework entstanden.
+
+
+import VerticalBar from "./HAChart";
+
+<VerticalBar/>
+
+Zur Häufigkeitsanalyse.
+Zuerst gilt auch hier wieder die Frage was soll erreicht werden?
+
+Es soll ein Alghoritmus enstehen der ein eingegebenen Text zerlegt und zählt wie viele einzelne Buchstaben vorhanden sind. Schlussendlich fehlt noch die einfache Konversion in den relativen Anteil angegeben in Prozent.
+
+Der Alghoritmus geht also nach folgenden Schritten vor:
+1. Baue einen Lookup Table mit dem Alphabet und fülle jede Stelle mit 0
+2. Zähle die Buchstaben des Geheimtextes
+3. Rechne um in Prozent
+
+***
+###### Schritt 1
+
+Der Alghoritmus wie man eine Liste mit den Buchstaben von *A-Z* erschafft sollte noch aus der Erklärung der [Cäsar Verschlüsselung](https://kryptic-storys.de/caesar) bekannt sein.
+
+```python
+alphabet = [chr(c) for c in range(65, 91)]
+```
+
+Mit dieser Liste können wir nun im folgenden den Lookup Table bauen. Der Schlüssel für das Dictionary soll der Buchstabe sein und der Wert immer 0. Es wird dementsprechend über die Länge des Alphabets iteriert:
+
+```python
+table = {alphabet[i]: 0 for i in range(len(alphabet))}
+```
+
+Das ist absolut Valide, **aber** so verwendet man Python aber nicht. Pythons *for-loop* funktioniert ein bisschen anders.
+Statt dauerhaft eine Variable hochzuzählen (in diesem Fall *i*) können wir uns die Elemente (Buchstaben) der Liste auch direkt geben lassen. Das sieht dann wie folgt aus:
+
+```python
+table = {el: 0 for el in alphabet}
+```
+
+*el* steht für *Element*. Was passiert dort?
+Angenommen sei ein Auschnitt der List *['A', 'B', 'C']* die Variable *el* nimmt bei jedem Schleifendurchlauf den Wert von vorne nachhinten an. Das nennt man einen *For-Each-loop ("für jedes Element")*.
+Folgende Tabelle zeigt welche Werte zur Laufzeit angenommen werden:
+
+| Schleifendurchlauf:	 | Wert der Variabl *el*:|
+|:----------------------:|:---------------------:| 
+| 1      				 | 'A' 					 | 
+| 2      				 | 'B'      			 | 
+| 3	 					 | 'C'      			 | 
+
+Nur das dies im oberen Beispiel mit allen Werten von *A-Z* passiert.
+
+Geht man nun aufs Ganze kombiniert man beide Alghoritmen. 
+
+```python
+table = {chr(c): 0 for c in range(65, 91)}
+
+# Output
+{
+'A': 0, 'B': 0,
+'C': 0, 'D': 0,
+'E': 0, 'F': 0,
+'G': 0, 'H': 0,
+'I': 0, 'J': 0,
+'K': 0, 'L': 0,
+'M': 0, 'N': 0,
+'O': 0, 'P': 0,
+'Q': 0, 'R': 0,
+'S': 0, 'T': 0,
+'U': 0, 'V': 0,
+'W': 0, 'X': 0,
+'Y': 0, 'Z': 0
+}
+```
+***
+###### Schritt 2
+Zuerst brauchen wir eine Variable die unseren Text enthält. Python hat für die Deklaration von Zeichenketten (auch Strings gennant) 3 Möglichkeite. Zwei davon sind bereits bekannt.
+
+1. *' Text '*
+2. *" Kurzer Text "*
+3. *''' Langer Text '''*
+
+Obwohl es vollkommen valide ist alle 3 Möglichkeiten in allen Situationen zu verwenden, gibt es dennoch einige Konventionen unter Python Entwicklern. 
+Diese *Good Pratices* verwendet man wie folgt:
+
+1. *'A'* <= 'Einfache Anführungszeichen' sind gedacht für einzelne oder sehr kurze Zeichen. Persönlich verwende ich Sie nur für einzelne Zeichen
+2. *"Einzeiliger Text"* <= "Doppelte Anführungszeichen" sind für einzeilige Texte und Bezeichner vergeben.
+3. *'''Ein wirklich Langer Text, der über mehrere Zeilen geht!'''* <= '''Dreifache Anführungszeichen''' sind für Lange Zeichenketten über mehrere Zeilen, Kommentare und zur Dokumentation des Codes Gedacht. (Einzeilige Kommentare werden in Python mit *#* angeführt!)
+
+Letzteres wird nun für das Cäsar verschlüsselte Gedicht *Abendsonne*, von Johann Wolfgang von Goethe aus dem Jahr 1790, verwendet.
+
+```python
+chiffre = '''
+	DGVTCEJVGVYKGKPCDGPFUQPP
+	GINWVFKGITWGPWOIGDGPGPJW
+	GVVGPUEJKOOGTPUKGTWGEMVW
+	PFYGKEJVFGTVCIKUVWGDGTNG
+	DVFQTVGKNVUKGJKPWPFHQGTF
+	GTVPGWGUNGDGPQFCUUMGKPHN
+	WGIGNOKEJXQODQFGPJGDVKJT
+	PCEJWPFKOOGTPCEJBWUVTGDG
+	PKEJUCGJKOGYIGPCDGPFUVTC
+	JNFKGUVKNNGYGNVBWOGKPGPH
+	WGUUGPGPVBWGPFGVCNNGJQGJ
+	PDGTWJKIVLGFGUVCNFGPUKND
+	GTDCEJKPIQNFGPGUVTQGOGHN
+	KGUUGPPKEJVJGOOVGFCPPFGP
+	IQGVVGTINGKEJGPNCWHFGTYK
+	NFGDGTIOKVCNNGPUGKPGPUEJ
+	NWEJVGPUEJQPVWVFCUOGGTUK
+	EJOKVGTYCGTOVGPDWEJVGPXQ
+	TFGPGTUVCWPVGPCWIGPCWHFQ
+	EJUEJGKPVFKGIQGVVKPGPFNK
+	EJYGIBWUKPMGPCNNGKPFGTPG
+	WGVTKGDGTYCEJVKEJGKNGHQT
+	VKJTGYIGUNKEJVBWVTKPMGPX
+	QTOKTFGPVCIWPFJKPVGTOKTF
+	KGPCEJVFGPJKOOGNWGDGTOKT
+	WPFWPVGTOKTFKGYGNNGPGKPU
+	EJQGPGTVTCWOKPFGUUGPUKGG
+	PVYGKEJVCEJBWFGUIGKUVGUH
+	NWGIGNPYKTFUQNGKEJVMGKPM
+	QGTRGTNKEJGTHNWGIGNUKEJI
+	GUGNNGPFQEJKUVGULGFGOGKP
+	IGDQTGPFCUUUGKPIGHWGJNJK
+	PCWHWPFXQTYCGTVUFTKPIVYG
+	PPWGDGTWPUKODNCWGPTCWOXG
+	TNQTGPKJTUEJOGVVGTPFNKGF
+	FKGNGTEJGUKPIVYGPPWGDGTU
+	EJTQHHGPHKEJVGPJQGJGPFGT
+	CFNGTCWUIGDTGKVGVUEJYGDV
+	WPFWGDGTHNCGEJGPWGDGTUGG
+	PFGTMTCPKEJPCEJFGTJGKOCV
+	UVTGDV
+'''
+```	
+
+Um die Buchstaben zu zählen weißen wird Python angewiesen, sich jeden Buchstaben anzuschauen und ihn als Schlüssel für den Lookup Table zu verwenden. Anschließend wird der Wert an dieser Stelle um 1 erhöht. Hierzu wird über den Text, wie folgt, iteriert:
+
+```python
+for el in chiffre:
+	table[el] += 1 
+```  
+
+Schauen wir nach diesem Schritt in die Tabelle rein wird man folgendes festellen:
+
+```python
+{
+'A': 0, 'B': 6,
+'C': 37, 'D': 26,
+'E': 38, 'F': 48, 
+'G': 185, 'H': 15, 
+'I': 25, 'J': 56, 
+'K': 74, 'L': 2, 
+'M': 7, 'N': 45, 
+'O': 28, 'P': 96, 
+'Q': 25, 'R': 1, 
+'S': 0, 'T': 66, 
+'U': 52, 'V': 67, 
+'W': 46, 'X': 5, 
+'Y': 16, 'Z': 0
+}
+```
+***
+###### Schritt 3
+
+Da die Tabelle ausschließlich Absolutwerte enthält die bei einer Häufigkeitsanalyse aber nicht Hilfreich sind, werden diese anschließend mit in Relativwerte umgerechnet.
+
+Dazu ein kleiner mathematischer Exkurs in Prozentrechnung.
+
+Das Verhältnis der Werte ist immer
+
+*Prozentwert (W) / Grundwert (G) = Prozentsatz (p%) / Grundmenge (100%)*
+
+Kurz:
+
+*W/G = p%/100%*
+
+Der Relativwert und Prozentwert sind in diesem Fall dasselbe. Durch einfach Umstellen erhält man die Formel:
+
+_W/G * 100% = p%_
+
+In dem Analysealghoritmus ist der Grundwert *(G)* gleich der Länge der Zeichen in der Variable *chiffre*.
+
+```python
+len(chiffre)
+
+# Output
+
+966
+```
+
+Die Grundmenge *(100%)* bleibt immer die Selbe. der Prozentwert *(W)* ist jeder Wert zu jedem zu jedem Schlüssel nach der Zählung in der Tabelle. Als Beispiel für den Buchstaben *'G'*:
+
+```python
+table['G']
+
+# Output
+
+185
+```
+
+Examplarisch wird nun der Prozentsatz *(p%)* für den Wert *'G' = 185* ausgerechnet.
+Nach einsetzen in die Formel erhält man:
+
+_185/966 * 100% = 19.15%_
+
+Nun wird das Verfahren verallgemeinert auf alle Werte der Tabelle angewand. Dabei wird kein neuer Wert erstellt, sondern an selbiger Position neu überschrieben. Dafür wird über die gesamte Tabelle iteriert und die Formel auf die einzelnen Werte angewand.
+
+```python
+for key, value in table.items():
+	table[key] = table[key] / len(chiffre) * 100
+```
+
+Als kleine Ergänzung 'addiere' ich noch ans ende der Rechnung ein *%-Zeichen*.
+Da die Zahlen viel zu genau sind, wird noch die Funktion *round()* verwendet um auf 2 Nachkommastellen zu runden.
+Der Code sieht dann wie folgt aus:
+
+```python
+for key, value in table.items():
+	table[key] = str(round(table[key] / len(chiffre) * 100, 2)) + '%'
+```
+
+Folgende Ausgabe ergibt sich dann nach erfolgreicher Rechnung
+
+```python
+{
+'A': '0.0%', 'B': '0.62%', 
+'C': '3.83%', 'D': '2.69%', 
+'E': '3.93%', 'F': '4.97%', 
+'G': '19.15%', 'H': '1.55%', 
+'I': '2.59%', 'J': '5.8%', 
+'K': '7.66%', 'L': '0.21%', 
+'M': '0.72%', 'N': '4.66%', 
+'O': '2.9%', 'P': '9.94%', 
+'Q': '2.59%', 'R': '0.1%', 
+'S': '0.0%', 'T': '6.83%', 
+'U': '5.38%', 'V': '6.94%', 
+'W': '4.76%', 'X': '0.52%', 
+'Y': '1.66%', 'Z': '0.0%'
+}
+```
+Damit wäre die Häufigkeitsanalyse abgeschlossen. Um nun den Text mittels dieser zu Entschlüsseln bedarf es der einer Tabelle mit der Häufigkeitsverteilung der deutschen Sprache.
+
+Die Werte, folgender Tabelle, sind aus dem Wikipedia Artikel zum Thema [Buchstabenhäufigkeit](https://de.wikipedia.org/wiki/Buchstabenh%C3%A4ufigkeit).
+
+| Buchstabe	 |Relative Häufigkeit|Errechnete Häufigkeit |
+|:----------:|:-----------------:|:--------------------:|
+| A      	 | 6,51% 			 | 0,00% 			 	| 
+| B      	 | 1,89%      		 | 0,62% 			 	| 
+| C	 		 | 3,06%      		 | 3,83% 			 	| 
+| D      	 | 5,08%      		 | 2,69% 				| 
+| E	 		 | 17,40%      		 | 3,93% 				| 
+| F      	 | 1,66%      		 | 4,97% 				| 
+| G	 		 | 3,01%      		 | 19,15% 			 	| 
+| H      	 | 4,76%      		 | 1,55% 			 	| 
+| I	 		 | 7,55%      		 | 2,59% 			 	| 
+| J      	 | 0,27%      		 | 5,80% 			 	| 
+| K	 		 | 1,21%      		 | 7,66% 			 	| 
+| L      	 | 3,44%      		 | 0,21% 			 	| 
+| M	 		 | 2,53%      		 | 0,72% 			 	| 
+| N      	 | 6,78%      		 | 4,66% 			 	| 
+| O	 		 | 2,51%    		 | 2,90% 			 	| 
+| P      	 | 0,76%      		 | 9,94% 			 	| 
+| Q	 		 | 0,02%      		 | 2,59% 			 	| 
+| R      	 | 7,00%      		 | 0,10% 			 	| 
+| S	 		 | 7,27%      		 | 0,00% 			 	| 
+| T      	 | 6,15%      		 | 6,83% 			 	| 
+| U	 		 | 4,35%      		 | 5,38% 			 	| 
+| V      	 | 0,67%      		 | 6,49% 			 	| 
+| W	 		 | 1,89%      		 | 4,76% 			 	| 
+| X      	 | 0,03%      		 | 0,52% 			 	| 
+| Y	 		 | 0,04%      		 | 1,66% 			 	| 
+| Z      	 | 1,13%      		 | 0,00% 			 	| 
+
+
+Kleine Aufgabe:
+Entschlüssel mit gegebenen Informationen das Chiffirte Gedicht Abendsonne.
+***
+*Das Original*:
+
+## Abendsonne
+
+Betrachtet, wie in Abendsonne-Glut
+
+Die grünumgebenen Hütten schimmern!
+
+Sie rückt und weicht, der Tag ist überlebt,
+
+Dort eilt sie hin und fördert neues Leben.
+
+O ! daß kein Flügel mich vom Boden hebt,
+
+Ihr nach und immer nach zu streben!
+
+Ich säh’ im ew’gen Abendstrahl
+
+Die stille Welt zu meinen Füßen,
+
+Entzündet alle Höhn, beruhigt jedes Tal,
+
+Den Silberbach in goldene Ströme fließen.
+
+Nicht hemmte dann den göttergleichen Lauf
+
+Der wilde Berg mit allen seinen Schluchten;
+
+Schon tut das Meer sich mit erwärmten Buchten
+
+Vor den erstaunten Augen auf.
+
+Doch scheint die Göttin endlich wegzusinken;
+
+Allein der neue Trieb erwacht,
+
+Ich eile fort, ihr ew’ges Licht zu trinken,
+
+Vor mir den Tag und hinter mir die Nacht,
+
+Den Himmel über mir und unter mir die Wellen.
+
+Ein schöner Traum, indessen sie entweicht!
+
+Ach, zu des Geistes Flügeln wird so leicht
+
+Kein körperlicher Flügel sich gesellen.
+
+Doch ist es jedem eingeboren,
+
+Daß sein Gefühl hinauf und vorwärts dringt,
+
+Wenn über uns, im blauen Raum verloren,
+
+Ihr schmetternd Lied die Lerche singt,
+
+Wenn über schroffen Fichtenhöhen
+
+Der Adler ausgebreitet schwebt
+
+Und über Flächen, über Seen
+
+Der Kranich nach der Heimat strebt.
+
+Johann Wolfgang von Goethe, 1790
+
+
+***
+*Editors Side Note*
+
+Mein erster mathematischer Beweis war einer zur Prozentrechung.
+Nicht nur das er sehr einfach ist, er erleichtert einem sogar das Leben beim Einkaufen.
+
+Aufgabe:
+
+Beweise das *x% von y = y% von x* ist.
+
+Den Beweis überlass ich jedem gerne selbst!
+
+Dennoch ein Beispiel:
+
+Ein Pulli für *75€* wird mit *20%* Rabatt verkauft.
+Wie viel ist *20% von 75€*?
+Zu kompliziert? Sehe ich genauso.
+Dreht man das um bekommt man die Fragestellung:
+
+Wie viel ist *75% von 20€*?
+
+Das ist simple. *15€*! Der Pulli kostet also nur *50€* und das alles fix im Kopf.
+Auch wenn Ladenpreise normalerweise auf *XX.99€* enden kann man dennoch den *1ct* dazu runden und hat immer noch ein akurates Ergebnis. 
+
+
+

@@ -40,11 +40,11 @@ const caesar = (text, offset, encode) => {
 
 	var table = {};
 	if (encode) {
-		for (var i = 0; i < alphabet.length; i++) {
+		for (i = 0; i < alphabet.length; i++) {
 			table[alphabet[i]] = shifted[i];
 		}
 	} else {
-		for (var i = 0; i < alphabet.length; i++) {
+		for (i = 0; i < alphabet.length; i++) {
 			table[shifted[i]] = alphabet[i];
 		}
 	}
@@ -54,7 +54,7 @@ const caesar = (text, offset, encode) => {
 	text = text.replace(/[^a-zA-Z ]/g, "");
 	text = text.toUpperCase();
 	var cipher = "";
-	for (var i = 0; i < text.length; i++) {
+	for (i = 0; i < text.length; i++) {
 		//if (i % 20 === 0) cipher += '\n';
 		cipher += table[text[i]];
 	}
@@ -69,11 +69,9 @@ function CaesarForm() {
 	const [encode, setEncode] = useState(true);
 	const [offset, setOffset] = useState(2);
 
-	const [submitting, setSubmitting] = useState(false);
 	const handleSubmit = event => {
 	   event.preventDefault();
 	   setCipher(caesar(text, offset, encode));
-	   setSubmitting(true);
 	}
 
 	
@@ -113,7 +111,7 @@ function CaesarForm() {
 				onChange={event => setOffset(Number(event.target.value))}
 				style={{width: "30px"}}	                       	
 	        />
-
+	        
           	<label>
             <p>Chiffre:</p>
             <textarea

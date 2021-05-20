@@ -27,6 +27,7 @@
     "gatsby-plugin-sitemap": "^2.5.1",
     "gatsby-plugin-webpack-bundle-analyser-v2": "^1.1.13",
     "react": "^16.13.1",
+    "react-chartjs-2": "^3.0.3",
     "react-dom": "^16.13.1"
   },
   "devDependencies": {

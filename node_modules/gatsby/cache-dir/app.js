@@ -9,29 +9,20 @@ import { apiRunner, apiRunnerAsync } from "./api-runner-browser"
 import { setLoader, publicLoader } from "./loader"
 import { Indicator } from "./loading-indicator/indicator"
 import DevLoader from "./dev-loader"
-import asyncRequires from "$virtual/async-requires"
+import syncRequires from "$virtual/sync-requires"
 // Generated during bootstrap
 import matchPaths from "$virtual/match-paths.json"
 import { LoadingIndicatorEventHandler } from "./loading-indicator"
-import Root from "./root"
-import { init as navigationInit } from "./navigation"
-// ensure in develop we have at least some .css (even if it's empty).
-// this is so there is no warning about not matching content-type when site doesn't include any regular css (for example when css-in-js is used)
-// this also make sure that if all css is removed in develop we are not left with stale commons.css that have stale content
-import "./blank.css"
 
-// Enable fast-refresh for virtual sync-requires, gatsby-browser & navigation
-// To ensure that our <Root /> component can hot reload in case anything below doesn't
-// satisfy fast-refresh constraints
-module.hot.accept([
-  `$virtual/async-requires`,
-  `./api-runner-browser`,
-  `./navigation`,
-])
+if (process.env.GATSBY_HOT_LOADER === `fast-refresh` && module.hot) {
+  module.hot.accept(`$virtual/sync-requires`, () => {
+    // Manually reload
+  })
+}
 
 window.___emitter = emitter
 
-const loader = new DevLoader(asyncRequires, matchPaths)
+const loader = new DevLoader(syncRequires, matchPaths)
 setLoader(loader)
 loader.setApiRunner(apiRunner)
 
@@ -164,8 +155,8 @@ apiRunnerAsync(`onClientEntry`).then(() => {
     loader.loadPage(`/404.html`),
     loader.loadPage(window.location.pathname),
   ]).then(() => {
-    navigationInit()
-
+    const preferDefault = m => (m && m.default) || m
+    const Root = preferDefault(require(`./root`))
     domReady(() => {
       if (dismissLoadingIndicator) {
         dismissLoadingIndicator()
